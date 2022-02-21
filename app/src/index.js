@@ -82,7 +82,7 @@ class Game extends React.Component {
             this.setState({
                 history: [{squares: squares}].concat(history),
                 xIsNext: !this.state.xIsNext,
-                stepNumber: history.length
+                stepNumber: 0
             });
         }
     }
@@ -96,14 +96,17 @@ class Game extends React.Component {
 
     toggleOrder() {
         let ordering = 'desc';
+        let stepNum = this.state.history.length;
         
         if(this.state.ordering === 'desc') {
             ordering = 'asc';
+            stepNum = 1;
         }
         
         this.setState({
             history: this.state.history.reverse(),
-            ordering: ordering
+            ordering: ordering,
+            stepNumber: stepNum
         });
     }
 
@@ -111,7 +114,7 @@ class Game extends React.Component {
         const history = this.state.history;
         const stepNum = this.state.stepNumber;
         const order = this.state.ordering;
-        const current = history[(order === 'desc' ? stepNum : 0)];
+        const current = history[stepNum];
         const winner = calculateWinner(current.squares);
         const moves = history.map((step, move) => { // step = element, move = index
             const currentSquares = history[move];
@@ -124,11 +127,11 @@ class Game extends React.Component {
             const coords = move ?
                 '(column ' + lastMove.x + ', row ' + lastMove.y + ')' :
                 '';
-            const boldStyle = ((order === 'asc' && move === 1) || (order === 'desc' && move === stepNum)) ? {fontWeight: 'bold'} : {};
+            const boldStyle = (move === stepNum) ? {fontWeight: 'bold'} : {};
 
             return (
                 <li style={boldStyle} key={move}>
-                    <button style={boldStyle} onClick={() => this.jumpTo(move)}>{desc}</button>
+                    <button style={boldStyle} onClick={() => this.jumpTo(order === 'desc' ? move : moveNum - move)}>{desc}</button>
                     <span style={{'paddingLeft': '10px'}}>{coords}</span>
                 </li>
             );
@@ -151,8 +154,16 @@ class Game extends React.Component {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    <button onClick={() => this.toggleOrder()}>Toggle Ordering</button>
-                    <span style={{'paddingLeft': '10px'}}>{(this.state.ordering === 'desc') ? 'Oldest to Newest' : 'Newest to Oldest'}</span>
+                    {
+                        (history.length > 1)
+                        ? (
+                            <>
+                                <button onClick={() => this.toggleOrder()}>Toggle Ordering</button>
+                                <span style={{'paddingLeft': '10px'}}>{(this.state.ordering === 'desc') ? 'Oldest to Newest' : 'Newest to Oldest'}</span>
+                            </>
+                        )
+                        : null
+                    }
                     <ol>{moves}</ol>
                 </div>
             </div>
