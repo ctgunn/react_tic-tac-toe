@@ -95,17 +95,17 @@ class Game extends React.Component {
     }
 
     toggleOrder() {
-        let ordering = 'desc';
-        let stepNum = this.state.history.length;
+        let order = 'desc';
+        let stepNum = this.state.history.length - 1;
         
         if(this.state.ordering === 'desc') {
-            ordering = 'asc';
-            stepNum = 1;
+            order = 'asc';
+            stepNum = 0;
         }
         
         this.setState({
             history: this.state.history.reverse(),
-            ordering: ordering,
+            ordering: order,
             stepNumber: stepNum
         });
     }
@@ -118,20 +118,26 @@ class Game extends React.Component {
         const winner = calculateWinner(current.squares);
         const moves = history.map((step, move) => { // step = element, move = index
             const currentSquares = history[move];
-            const previousSquares = move ? history[move - 1] : null;
+            const histLen = history.length;
+            const decision = ((order === 'desc' && move) || (order === 'asc' && move !== histLen - 1));
+            const previousSquares = decision ? history[(order === 'desc' ? move - 1 : move + 1)] : null;
             const lastMove = getLastMove(previousSquares, currentSquares);
-            const moveNum = history.length - move;
-            const desc = move ?
+            const moveNum = histLen - move - 1;
+            const desc = decision ?
                 'Go to move #' + (order === 'desc' ? move : moveNum) :
                 'Go to game start';
-            const coords = move ?
+            const coords = decision ?
                 '(column ' + lastMove.x + ', row ' + lastMove.y + ')' :
                 '';
-            const boldStyle = (move === stepNum) ? {fontWeight: 'bold'} : {};
+            const boldStyle = (order === 'desc' && move === stepNum)
+                    || (order === 'asc' && (
+                    (stepNum === 0 && move === 0) || (stepNum !== 0 && move === stepNum))) ?
+                {fontWeight: 'bold'} :
+                {};
 
             return (
                 <li style={boldStyle} key={move}>
-                    <button style={boldStyle} onClick={() => this.jumpTo(order === 'desc' ? move : moveNum - move)}>{desc}</button>
+                    <button style={boldStyle} onClick={() => this.jumpTo(move)}>{desc}</button>
                     <span style={{'paddingLeft': '10px'}}>{coords}</span>
                 </li>
             );
@@ -154,17 +160,9 @@ class Game extends React.Component {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    {
-                        (history.length > 1)
-                        ? (
-                            <>
-                                <button onClick={() => this.toggleOrder()}>Toggle Ordering</button>
-                                <span style={{'paddingLeft': '10px'}}>{(this.state.ordering === 'desc') ? 'Oldest to Newest' : 'Newest to Oldest'}</span>
-                            </>
-                        )
-                        : null
-                    }
-                    <ol>{moves}</ol>
+                    <button onClick={() => this.toggleOrder()}>Toggle Ordering</button>
+                    <span style={{'paddingLeft': '10px'}}>{(this.state.ordering === 'desc') ? 'Oldest to Newest' : 'Newest to Oldest'}</span>
+                    <ol reversed={order === 'asc' ? "reversed" : ""}>{moves}</ol>
                 </div>
             </div>
         );
