@@ -118,6 +118,7 @@ class Game extends React.Component {
         const order = this.state.ordering;
         const current = history[stepNum];
         const winner = calculateWinner(current.squares);
+        const draw = calculateDraw(current.squares);
         const moves = history.map((step, move) => { // step = element, move = index
             const currentSquares = history[move];
             const histLen = history.length;
@@ -151,6 +152,8 @@ class Game extends React.Component {
         if(!!winner) {
             status = 'Winner: ' + winner.winner;
             set = winner.set;
+        } else if(draw) {
+            status = 'The match has ended in a DRAW!'
         } else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
             set = [];
@@ -165,7 +168,7 @@ class Game extends React.Component {
                         winner={set}/>
                 </div>
                 <div className="game-info">
-                    <div>{status}</div>
+                    <div style={{'paddingBottom': '10px'}>{status}</div>
                     <button onClick={() => this.toggleOrder()}>Toggle Ordering</button>
                     <span style={{'paddingLeft': '10px'}}>{(this.state.ordering === 'desc') ? 'Oldest to Newest' : 'Newest to Oldest'}</span>
                     <ol reversed={order === 'asc' ? "reversed" : ""}>{moves}</ol>
@@ -206,6 +209,16 @@ function calculateWinner(squares) {
     }
 
     return null;
+}
+
+function calculateDraw(squares) {
+    for(let i = 0; i < squares.length; i++) {
+        if(!squares[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function getLastMove(previous, current) {
