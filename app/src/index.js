@@ -168,7 +168,7 @@ class Game extends React.Component {
                         winner={set}/>
                 </div>
                 <div className="game-info">
-                    <div style={{'paddingBottom': '10px'}>{status}</div>
+                    <div style={{'paddingBottom': '10px'}}>{status}</div>
                     <button onClick={() => this.toggleOrder()}>Toggle Ordering</button>
                     <span style={{'paddingLeft': '10px'}}>{(this.state.ordering === 'desc') ? 'Oldest to Newest' : 'Newest to Oldest'}</span>
                     <ol reversed={order === 'asc' ? "reversed" : ""}>{moves}</ol>
