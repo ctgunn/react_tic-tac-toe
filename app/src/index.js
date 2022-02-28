@@ -61,8 +61,15 @@ class Game extends React.Component {
     }
 
     handleClick(i) {
-        const history = this.state.history.slice(0, this.state.stepNumber + 1);
+        let  history;
         const order = this.state.ordering;
+
+        if(order === 'asc') {
+            history = this.state.history.slice(this.state.stepNumber, this.state.history.length);
+        } else {
+            history = this.state.history.slice(0, this.state.stepNumber + 1);
+        }
+
         const current = history[(order === 'desc' ? history.length - 1 : 0)];
         const squares = current.squares.slice();
 
